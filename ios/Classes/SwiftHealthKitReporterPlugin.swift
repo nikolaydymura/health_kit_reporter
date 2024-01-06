@@ -26,6 +26,7 @@ public class SwiftHealthKitReporterPlugin: NSObject, FlutterPlugin {
         } catch {
             print(error)
         }
+        registrar.addApplicationDelegate(instance)
     }
     private static func registerMethodChannel(
         registrar: FlutterPluginRegistrar,
@@ -52,5 +53,18 @@ public class SwiftHealthKitReporterPlugin: NSObject, FlutterPlugin {
             let streamHandler = try StreamHandlerFactory.make(with: reporter, for: event)
             eventChannel.setStreamHandler(streamHandler)
         }
+    }
+    
+    public func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [AnyHashable : Any] = [:]) -> Bool {
+        let items = ["HKQuantityTypeIdentifierHeartRate",     "HKQuantityTypeIdentifierSixMinuteWalkTestDistance",
+                     "HKQuantityTypeIdentifierVO2Max",
+                     "HKWorkoutTypeIdentifier"
+        ].map { $0.objectType }.compactMap { $0 }
+        for item in items {
+            reporter?.observer.enableBackgroundDelivery(type: item, frequency: .immediate) { status, error in
+                print("\(#file): enableBackgroundDelivery \(item) \(status)")
+            }
+        }
+        return true
     }
 }
