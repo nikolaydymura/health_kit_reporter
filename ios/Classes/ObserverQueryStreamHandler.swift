@@ -48,7 +48,13 @@ extension ObserverQueryStreamHandler: StreamHandlerProtocol {
                 else {
                     return
                 }
-                events(["identifier": identifier])
+                if Thread.current.isMainThread {
+                    events(["identifier": identifier])
+                } else {
+                    DispatchQueue.main.async {
+                        events(["identifier": identifier])
+                    }
+                }
             }
             plannedQueries.insert(query)
         }

@@ -56,13 +56,12 @@ public class SwiftHealthKitReporterPlugin: NSObject, FlutterPlugin {
     }
     
     public func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [AnyHashable : Any] = [:]) -> Bool {
-        let items = ["HKQuantityTypeIdentifierHeartRate",     "HKQuantityTypeIdentifierSixMinuteWalkTestDistance",
-                     "HKQuantityTypeIdentifierVO2Max",
-                     "HKWorkoutTypeIdentifier"
-        ].map { $0.objectType }.compactMap { $0 }
-        for item in items {
-            reporter?.observer.enableBackgroundDelivery(type: item, frequency: .immediate) { status, error in
-                print("\(#file): enableBackgroundDelivery \(item) \(status)")
+        if let backgroundItems = UserDefaults.standard.value(forKey: "BackgroundDeliveryItems") as? [String] {
+            let items = backgroundItems.map { $0.objectType }.compactMap { $0 }
+            for item in items {
+                reporter?.observer.enableBackgroundDelivery(type: item, frequency: .immediate) { status, error in
+                    print("\(#file): enableBackgroundDelivery \(item) \(status)")
+                }
             }
         }
         return true

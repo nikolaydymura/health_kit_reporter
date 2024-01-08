@@ -1131,6 +1131,14 @@ extension SwiftHealthKitReporterPlugin {
                     )
                     return
                 }
+                let settings = UserDefaults.standard
+                if var items = settings.value(forKey: "BackgroundDeliveryItems") as? [String] {
+                    items.append(identifier)
+                    settings.setValue(items, forKey: "BackgroundDeliveryItems")
+                } else {
+                    settings.setValue([identifier], forKey: "BackgroundDeliveryItems")
+                }
+                settings.synchronize()
                 result(success)
             }
         } catch {
